@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='rate-limit-py',
@@ -8,8 +8,8 @@ setup(
     description='Basic rate limiter using redis',
     url='https://github.com/Contatta/rate-limit-py',
     author='Contatta',
-    packages=find_packages(),
-    package_data={'rate_limit' : [ 'lua/*.lua']},
+    packages=find_packages('rate_limit'),
+    package_data={'rate_limit' : [ '*.lua']},
     include_package_data=True
 )
 
