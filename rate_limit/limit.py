@@ -5,8 +5,8 @@ class Limit():
 
     def __init__(self, host='localhost', port=6379, root='rate-limit'):
         self._redis = self._getRedis(host, port)
-        self._lua = self._getLua()
         self._root = root
+        self._lua = self._getLua()
 
     def checkRate(self, name, max, duration):
         """
@@ -40,8 +40,12 @@ class Limit():
 
         :return:
         """
-        data = pkgutil.get_data('rate_limit', 'lua/over_limit.lua')
-        return self._redis.register_script(data)
+        result = None
+        if self._redis:
+            data = pkgutil.get_data('rate_limit', 'lua/over_limit.lua')
+            result = self._redis.register_script(data)
+        return result
+
 
     def assertRedis(self):
         """
