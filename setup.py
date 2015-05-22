@@ -8,7 +8,7 @@ setup(
     description          = 'Basic rate limiter using redis',
     url                  = 'https://github.com/Contatta/rate-limit-py',
     author               = 'Contatta',
-    packages             = ['rate_limit','decorators']
+    packages             = ['rate_limit','rate_limit.decorators','rate_limit.lua']
 )
 
 #python setup.py install
