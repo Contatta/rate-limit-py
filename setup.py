@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='rate-limit-py',
@@ -9,7 +9,7 @@ setup(
     url='https://github.com/Contatta/rate-limit-py',
     author='Contatta',
     packages=['rate_limit','rate_limit.decorators'],
-    package_data={'rate_limit': ['*.lua']},
+    package_data={'rate_limit': ['lua/*.lua']},
     include_package_data=True
 )
 
