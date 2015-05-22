@@ -4,7 +4,7 @@ import redis
 class Limit():
 
     def __init__(self, host='localhost', port=6379, root='rate-limit'):
-        self._redis = redis.Redis(host=host, port=port)
+        self._redis = self._getRedis(host, port)
         self._lua = self._getLua()
         self._root = root
 
@@ -17,6 +17,8 @@ class Limit():
         :param duration:
         :return: <LIMITRESULT>
         """
+        self.assertRedis()
+
         ok, count, reset = self._lua(
             keys=['rate_limit:' + name],
             args=[
@@ -24,6 +26,13 @@ class Limit():
                 duration
             ])
         return LimitResult(name, bool(ok), int(count), duration, int(reset))
+
+    def _getRedis(self, host, port):
+        try:
+            return redis.Redis(host=host, port=port)
+        except:
+            return None
+
 
     def _getLua(self):
         """
@@ -33,6 +42,13 @@ class Limit():
         """
         data = pkgutil.get_data('rate_limit', 'lua/over_limit.lua')
         return self._redis.register_script(data)
+
+    def assertRedis(self):
+        """
+        Validate redis is available
+        """
+        if self._redis is None:
+            raise RedisUnavailable()
 
 
 class LimitResult():
@@ -45,3 +61,7 @@ class LimitResult():
         self.count = count
         self.duration = duration
         self.reset = reset
+
+
+class RedisUnavailable(Exception):
+    pass
