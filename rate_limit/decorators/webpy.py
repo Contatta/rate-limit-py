@@ -4,7 +4,7 @@ def rate_limit(LIMIT, WEB, max, duration):
     """
     def wrap(f):
         def wrapped_f(*args, **kwargs):
-            name = args[0].__class__.__name__ + '.' + f.__name__
+            name = WEB.ctx['ip']+ ':' + args[0].__class__.__name__
             rate_ok = False
             try:
                 result = LIMIT.checkRate(
@@ -20,7 +20,9 @@ def rate_limit(LIMIT, WEB, max, duration):
 
                 #set HTTP code if limit is exceeded
                 if not result.ok:
-                    WEB.TooManyRequests()
+                    return WEB.TooManyRequests()
+                else:
+                    rate_ok = True
             except:
                 #Don't fail requests if limiting is broke
                 rate_ok = True
