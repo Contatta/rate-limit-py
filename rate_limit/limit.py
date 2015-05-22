@@ -1,10 +1,11 @@
 import pkgutil
 import redis
+from redis.connection import ConnectionError
 
 class Limit():
 
     def __init__(self, host='localhost', port=6379, root='rate-limit'):
-        self._redis = self._getRedis(host, port)
+        self._redis = redis.Redis(host=host, port=port)
         self._root = root
         self._lua = self._getLua()
 
@@ -27,31 +28,28 @@ class Limit():
             ])
         return LimitResult(name, bool(ok), int(count), duration, int(reset))
 
-    def _getRedis(self, host, port):
-        try:
-            return redis.Redis(host=host, port=port)
-        except:
-            return None
-
 
     def _getLua(self):
         """
-        Registers LUA script in redis
+        Registers LUA script in redis.  If it fails then we silently proceed
 
         :return:
         """
         result = None
-        if self._redis:
+        try:
             data = pkgutil.get_data('rate_limit', 'lua/over_limit.lua')
             result = self._redis.register_script(data)
-        return result
+        except ConnectionError:
+            pass
+        finally:
+            return result
 
 
     def assertRedis(self):
         """
         Validate redis is available
         """
-        if self._redis is None:
+        if self._lua is None:
             raise RedisUnavailable()
 
 
